@@ -23,9 +23,14 @@ python train.py --train data/train.csv --seed 20261023
 python predict.py --test data/test.csv --out submission.csv
 ```
 
+## Transformer experiment
+
+Run `transformer_all.ipynb` to fine-tune DistilRoBERTa, evaluate on the shared stratified 2,000-row development split, then refit on all labeled rows and write `submission_transformer.csv`.
+
 ## Seeds and notes
 
-- Global seed: `20261023`
+- Notebook split seed: `27` (shared by the model comparison notebooks)
+- `train.py` default seed: `20261023`
 - Validation: stratified 2,000-row holdout from `train.csv`, fixed across comparisons
 
 ## AI assistance

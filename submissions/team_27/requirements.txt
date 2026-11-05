@@ -10,3 +10,6 @@ torch
 
 # Enables this environment to run as a Jupyter notebook kernel
 ipykernel
+
+# Transformer fine-tuning notebook
+transformers>=4.40,<5.0
