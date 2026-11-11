@@ -1,7 +1,7 @@
 **Team members:** Rachel Liu (rl996), Henry Lam (hgl32), Yang Xiao (yx752)  
 **Kaggle team name:** `team-27`
 
-Final model: `svm_frozen_lm_yx752_v6.ipynb`. It blends the v5 SVM / gradient-boosting fusion of hand-built style features with a LightGBM model trained on frozen GPT-2 features (75% LM branch, 25% v5).
+Final model: `svm_frozen_lm_yx752_v6.ipynb`, with `RUN_PARAMETER_SEARCH=False` (the default). It blends the v5 SVM / gradient-boosting fusion of hand-built style features with a LightGBM model trained on frozen GPT-2 features (75% LM branch, 25% v5).
 
 ## Setup
 
@@ -80,18 +80,21 @@ jupyter nbconvert --to notebook --execute --inplace \
 The notebook:
 
 - holds out a stratified 2,000-row development split from `train.csv` (seed 27, saved to `v6_results/val_ids.csv`)
-- picks the LM-branch config and blend weight using 3-fold out-of-fold AUROC on the training split only
+- reproduces the recorded final LM branch: 31 leaves, 400 trees, learning rate 0.03, L2=2, LM-branch weight 0.75
+- computes three-fold training OOF scores for calibration, without selecting another model
 - scores the chosen blend once on the development split (`v6_results/development_comparison.csv`, `v6_results/summary.json`)
 
-Once the features from Step 1 exist, the notebook runs on CPU. If a cache of v5 out-of-fold scores is present, the notebook can use it. Without one, it recomputes those scores.
+Once the features from Step 1 exist, the notebook runs on CPU. Optional environment variables `V6_DATA_DIR` and `V6_LM_FEATURE_DIR` can point to another existing data/feature directory; otherwise the documented relative directories are used. Baseline OOF scores are recomputed. To repeat the earlier search as a separate experiment, set `RUN_PARAMETER_SEARCH=True`; its outputs go to `v6_search_results/`, rather than replacing the default final-run outputs.
 
-Reference results (`v6_results/summary.json`): v5 baseline 0.99810, frozen branch 0.99940, selected blend **0.99960** development AUROC.
+Original submitted-configuration reference results: v5 baseline 0.998104, frozen branch 0.999448, selected blend **0.999590** development AUROC. The original public AUROC was **0.98872**. These reference values identify the recorded run; rerunning the same parameters on another hardware/software stack may produce small numerical differences.
 
 **Optional report analyses** (training AUROC, learning curve, length bins, error examples, unlabeled-data experiment). These don't overwrite the submission:
 
 ```bash
 python v6_report_analysis.py      # writes to v6_results/report/
 ```
+
+Reproducibility depends on both model settings and the frozen feature tables. The original run used CUDA/float16 extraction with torch 2.5.1; a CPU/float32 extraction or different package versions can change feature values slightly. Keep the feature sidecars and input hashes when comparing runs.
 
 ## Predict (writes Kaggle submission)
 
@@ -115,9 +118,9 @@ cp v6_results/submission_yx752_v6.csv submission.csv
 
 - Final model seed: `SEED = 27`. It's used for the dev split, every `StratifiedKFold(n_splits=3)`, LightGBM / HistGradientBoosting and logistic calibration.
 - Validation: stratified 2,000-row holdout from `train.csv`. It's the same split across all model-comparison notebooks.
-- Chosen LM-branch config: LightGBM on GPT-2 + 73 style features, `num_leaves=15`, `n_estimators=800`, `learning_rate=0.02`, `reg_lambda=5`, `colsample_bytree=0.8`, `subsample=0.8`.
+- Chosen LM-branch config: LightGBM on GPT-2 + 73 style features, `num_leaves=31`, `n_estimators=400`, `learning_rate=0.03`, `reg_lambda=2`, `colsample_bytree=0.8`, `subsample=0.8`.
 - Blend: `0.25 × v5 logit + 0.75 × LM-branch logit`, then logistic calibration.
-- Frozen checkpoint: `openai-community/gpt2`. All supervised labels come from the provided `train.csv`. No external labeled data and no LLM APIs are used to label or predict test passages.
+- Frozen checkpoint: `openai-community/gpt2` (recorded revision `607a30d783dfa663caf39e06633721c8d4cfcd7e`). All supervised labels come from the provided `train.csv`. No external labeled data and no LLM APIs are used to label or predict test passages.
 
 ## AI assistance
 
