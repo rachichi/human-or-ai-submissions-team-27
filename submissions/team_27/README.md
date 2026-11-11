@@ -103,6 +103,12 @@ v6_results/submission_yx752_v6.csv
 
 It has columns `id,label` (P(AI)) and 3,000 rows, ordered like `sample_submission.csv`. The notebook asserts this format before it saves the file.
 
+To get the file as `submission.csv` for Kaggle:
+
+```bash
+cp v6_results/submission_yx752_v6.csv submission.csv
+```
+
 > `train.py` and `predict.py` are still the course template stubs and do nothing. Use the commands above.
 
 ## Seeds and notes
