@@ -1,0 +1,29 @@
+{
+  "seed": 27,
+  "frozen_model": "openai-community/gpt2",
+  "chosen": {
+    "family": "lgbm",
+    "view": "combined",
+    "leaves": 15,
+    "trees": 800,
+    "lr": 0.02,
+    "l2": 5
+  },
+  "new_weight": 0.75,
+  "selection_oof_auroc": 0.999177375,
+  "development": [
+    {
+      "model": "v5 baseline",
+      "development_auroc": 0.9981040000000001
+    },
+    {
+      "model": "Frozen branch",
+      "development_auroc": 0.9994010000000001
+    },
+    {
+      "model": "Selected blend",
+      "development_auroc": 0.999595
+    }
+  ],
+  "probability_development_auroc": 0.999595
+}
